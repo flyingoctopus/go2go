@@ -1,7 +1,7 @@
-# /Cargo.toml
+# go2go/Cargo.toml
 [workspace]
 members = [
     "server",
     "client",
 ]
-
+resolver = "2"
