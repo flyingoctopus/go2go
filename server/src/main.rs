@@ -1,13 +1,16 @@
+// server/src/main.rs
 use serde::{Deserialize, Serialize};
 use warp::Filter;
 
-#[derive(Serialize, Deserialize, Clone)]
+mod game_logic;
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
 struct GameState {
     board: Vec<Vec<Option<Player>>>,
     turn: Player,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug)]
 enum Player {
     Black,
     White,
@@ -15,12 +18,14 @@ enum Player {
 
 #[tokio::main]
 async fn main() {
-    let game_state = GameState {
-        board: vec![vec![None; 19]; 19],
-        turn: Player::Black,
-    };
-
-    let game_state = warp::any().map(move || warp::reply::json(&game_state));
+    let game_state = warp::path("game_state")
+        .map(|| {
+            let game = GameState {
+                board: vec![vec![None; 19]; 19],
+                turn: Player::Black,
+            };
+            warp::reply::json(&game)
+        });
 
     warp::serve(game_state).run(([127, 0, 0, 1], 3030)).await;
 }
